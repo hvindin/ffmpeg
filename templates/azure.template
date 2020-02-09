@@ -13,12 +13,13 @@ jobs:
 %%VERSIONS%%
   steps:
   - bash: |
-      docker build -t ${DOCKER}:${VERSION}-${VARIANT} --build-arg MAKEFLAGS="-j$(($(grep -c ^processor /proc/cpuinfo) + 1))" docker-images/${VERSION}/${VARIANT}
+      docker build -t ${DOCKER}:${VERSION}-${VARIANT} -t ${DOCKER}:${SHORT_VERSION}-${VARIANT} --build-arg MAKEFLAGS="-j$(($(grep -c ^processor /proc/cpuinfo) + 1))" docker-images/${SHORT_VERSION}/${VARIANT}
       docker run --rm ${DOCKER}:${VERSION}-${VARIANT} -buildconf
     displayName: Build docker image
   - bash: |
       docker login --username ${DOCKER_LOGIN} --password ${DOCKER_PASSWORD}
       docker push ${DOCKER}:${VERSION}-${VARIANT}
+      docker push ${DOCKER}:${SHORT_VERSION}-${VARIANT}
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: Push docker image
     env:

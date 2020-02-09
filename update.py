@@ -53,25 +53,31 @@ for version in keep_version:
         if version != "snapshot":
             short_version = version[0:3]
         else:
-            short_version = version
+            short_version = "snapshot"
 
         dockerfile = "docker-images/%s/%s/Dockerfile" % (short_version, variant)
         gitlabci.append(
             f"""
-{version}-{variant}:
+{short_version}-{variant}:
   extends: .docker
   stage: {variant}
   variables:
-    VERSION: "{short_version}"
+    SHORT_VERSION: "{short_version}"
+    VERSION: "{version}"
     VARIANT: {variant}
 """
         )
-
+        # Build the matric section
         azure.append(
-            "      %s_%s:\n        VERSION: %s\n        VARIANT: %s"
-            % (short_version.replace(".", "_"), variant, short_version, variant)
+            f"      %s_%s:\n        VERSION: %s\n        SHORT_VERSION: %s\n        VARIANT: %s"
+            % (
+                short_version.replace(".", "_"),
+                variant,
+                version,
+                short_version,
+                variant,
+            )
         )
-
         with open("templates/Dockerfile-env", "r") as tmpfile:
             env_content = tmpfile.read()
         with open("templates/Dockerfile-template." + variant, "r") as tmpfile:
