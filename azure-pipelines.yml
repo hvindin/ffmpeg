@@ -180,7 +180,7 @@ jobs:
         VARIANT: nvidia
   steps:
   - bash: |
-      docker build -t ${DOCKER}:${VERSION}-${VARIANT} -t ${DOCKER}:${SHORT_VERSION}-${VARIANT} --build-arg MAKEFLAGS="-j$(($(grep -c ^processor /proc/cpuinfo) + 1))" docker-images/${SHORT_VERSION}/${VARIANT}
+      docker build -t ${DOCKER}:${VERSION}-${VARIANT} -t ${DOCKER}:${SHORT_VERSION}-${VARIANT} --build-arg MAKEFLAGS="-j$(($(grep -c ^processor /proc/cpuinfo) + 1))" docker-images/${SHORT_VERSION}/${VARIANT}/
       docker run --rm ${DOCKER}:${VERSION}-${VARIANT} -buildconf
     displayName: Build docker image
   - bash: |
