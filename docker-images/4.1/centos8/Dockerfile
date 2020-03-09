@@ -44,6 +44,9 @@ ENV         FFMPEG_VERSION=4.1.5 \
             XVID_VERSION=1.3.4 \
             LIBXML2_VERSION=2.9.10 \
             LIBBLURAY_VERSION=1.1.2 \
+            GIFLIB_VERSION=5.2.1 \
+            LIBTIFF_VERSION=4.1.0 \
+            LIBPNG_VERSION=1.6.35 \
             SRC=/usr/local
 
 ARG         FREETYPE_SHA256SUM="5d03dd76c2171a7601e9ce10551d52d4471cf92cd205948e60289251daddffa8 freetype-2.5.5.tar.gz"
@@ -101,6 +104,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ## x264 http://www.videolan.org/developers/x264.html
 RUN \
         DIR=/tmp/x264 && \
@@ -112,6 +116,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### x265 http://x265.org/
 RUN \
         DIR=/tmp/x265 && \
@@ -125,6 +130,7 @@ RUN \
         ./multilib.sh && \
         make -C 8bit install && \
         rm -rf ${DIR}
+
 ### libogg https://www.xiph.org/ogg/
 RUN \
         DIR=/tmp/ogg && \
@@ -137,6 +143,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### libopus https://www.opus-codec.org/
 RUN \
         DIR=/tmp/opus && \
@@ -150,6 +157,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### libvorbis https://xiph.org/vorbis/
 RUN \
         DIR=/tmp/vorbis && \
@@ -162,6 +170,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### libtheora http://www.theora.org/
 RUN \
         DIR=/tmp/theora && \
@@ -174,6 +183,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### libvpx https://www.webmproject.org/code/
 RUN \
         DIR=/tmp/vpx && \
@@ -186,17 +196,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
-### libwebp https://developers.google.com/speed/webp/
-RUN \
-        DIR=/tmp/vebp && \
-        mkdir -p ${DIR} && \
-        cd ${DIR} && \
-        curl -sL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${WEBP_VERSION}.tar.gz | \
-        tar -zx --strip-components=1 && \
-        ./configure --prefix="${PREFIX}" --enable-shared  && \
-        make && \
-        make install && \
-        rm -rf ${DIR}
+
 ### libmp3lame http://lame.sourceforge.net/
 RUN \
         DIR=/tmp/lame && \
@@ -208,6 +208,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### xvid https://www.xvid.com/
 RUN \
         DIR=/tmp/xvid && \
@@ -221,6 +222,7 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ### fdk-aac https://github.com/mstorsjo/fdk-aac
 RUN \
         DIR=/tmp/fdk-aac && \
@@ -233,7 +235,45 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
-## openjpeg https://github.com/uclouvain/openjpeg
+
+### giflib https://sourceforge.net/projects/giflib
+RUN \
+        DIR=/tmp/giflib && \
+        mkdir -p ${DIR} && \
+        cd ${DIR} && \
+        curl -sL https://downloads.sourceforge.net/giflib/giflib-${GIFLIB_VERSION}.tar.gz | \
+        tar xz --strip-components=1 && \
+        make CFLAGS="%{optflags} -fPIC" && \
+        make install PREFIX="${PREFIX}" LIBDIR="${PREFIX}/lib" && \
+        rm -rf ${DIR}
+
+### libtiff http://www.simplesystems.org/libtiff/
+RUN \
+       DIR=/tmp/libtiff && \
+       mkdir -p ${DIR} && \
+       cd ${DIR} && \
+       curl -sL http://download.osgeo.org/libtiff/tiff-${LIBTIFF_VERSION}.tar.gz | \
+       tar xz --strip-components=1 --exclude=m4 && \
+       autoreconf -fiv && \
+       CFLAGS="${CFLAGS} -fno-strict-aliasing" ./configure --prefix=$PREFIX --enable-ld-version-script && \
+       CFLAGS="${CFLAGS} -fno-strict-aliasing" make DESTDIR=${PREFIX} && \
+       make DESTDIR=${PREFIX} install && \
+       rm -rf /tmp/libtiff
+
+#### libpng https://github.com/glennrp/libpng
+RUN \
+       DIR=/tmp/libpng && \
+       mkdir -p ${DIR} && \
+       cd ${DIR} && \
+       curl -sL https://github.com/glennrp/libpng/archive/v${LIBPNG_VERSION}.tar.gz | \
+       tar xz --strip-components=1 && \
+       autoreconf -fiv && \
+       ./configure --prefix=$PREFIX && \
+       make && \
+       make DESTDIR=${PREFIX} && \
+       rm -rf /tmp/libpng
+
+### openjpeg https://github.com/uclouvain/openjpeg
 RUN \
         DIR=/tmp/openjpeg && \
         mkdir -p ${DIR} && \
@@ -244,7 +284,20 @@ RUN \
         make && \
         make install && \
         rm -rf ${DIR}
-## freetype https://www.freetype.org/
+
+### libwebp https://developers.google.com/speed/webp/
+RUN \
+        DIR=/tmp/vebp && \
+        mkdir -p ${DIR} && \
+        cd ${DIR} && \
+        curl -sL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${WEBP_VERSION}.tar.gz | \
+        tar -zx --strip-components=1 && \
+        ./configure --prefix="${PREFIX}" --enable-shared  && \
+        make && \
+        make install && \
+        rm -rf ${DIR}
+
+### freetype https://www.freetype.org/
 RUN  \
         DIR=/tmp/freetype && \
         mkdir -p ${DIR} && \
@@ -256,6 +309,7 @@ RUN  \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ## libvstab https://github.com/georgmartius/vid.stab
 RUN  \
         DIR=/tmp/vid.stab && \
@@ -268,6 +322,7 @@ RUN  \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ## fridibi https://www.fribidi.org/
 RUN  \
         DIR=/tmp/fribidi && \
@@ -282,6 +337,7 @@ RUN  \
         make -j1 && \
         make install && \
         rm -rf ${DIR}
+
 ## fontconfig https://www.freedesktop.org/wiki/Software/fontconfig/
 RUN  \
         DIR=/tmp/fontconfig && \
@@ -293,6 +349,7 @@ RUN  \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ## libass https://github.com/libass/libass
 RUN  \
         DIR=/tmp/libass && \
@@ -306,6 +363,7 @@ RUN  \
         make && \
         make install && \
         rm -rf ${DIR}
+
 ## kvazaar https://github.com/ultravideo/kvazaar
 RUN \
         DIR=/tmp/kvazaar && \
