@@ -345,7 +345,6 @@ RUN  \
 
 RUN \
         DIR=/tmp/ffmpeg && mkdir -p ${DIR} && cd ${DIR} && \
-        ./configure \
         %%FFMPEG_CONFIG_FLAGS%%
         make && \
         make install && \

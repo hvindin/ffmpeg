@@ -85,10 +85,10 @@ RUN      buildDeps="autoconf \
                     python \
                     libssl-dev \
                     yasm \
-                    libva-dev \
                     zlib1g-dev" && \
         apt-get -yqq update && \
         apt-get install -yq --no-install-recommends ${buildDeps}
+
 ## opencore-amr https://sourceforge.net/projects/opencore-amr/
 RUN \
         DIR=/tmp/opencore-amr && \
@@ -436,6 +436,10 @@ RUN  \
 
 RUN \
         DIR=/tmp/ffmpeg && mkdir -p ${DIR} && cd ${DIR} && \
+        apt-get -yqq update && \
+        apt-get install -yq libva-dev --no-install-recomends && \
+        apt-get autoremove -yq && \
+        apt-get clean -yq && \
         ./configure \
         --disable-debug \
         --disable-doc \

@@ -169,6 +169,7 @@ for version in keep_version:
             template = tmpfile.read()
 
         FFMPEG_CONFIG_FLAGS = [
+            './configure',
             '--disable-debug',
             '--disable-doc',
             '--disable-ffplay',
@@ -218,6 +219,11 @@ for version in keep_version:
 
         if ((version == "snapshot" or int(version[0]) >= 3) and
                 variant['parent'] == "vaapi"):
+            FFMPEG_CONFIG_FLAGS = [
+                'apt-get -yqq update &&',
+                'apt-get install -yq libva-dev --no-install-recomends &&',
+                'apt-get autoremove -yq &&',
+                'apt-get clean -yq &&', ] + FFMPEG_CONFIG_FLAGS
             FFMPEG_CONFIG_FLAGS.append('--enable-vaapi')
 
         if variant['parent'] == "nvidia":

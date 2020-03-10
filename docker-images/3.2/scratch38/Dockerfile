@@ -4,7 +4,12 @@
 #
 #
 
-FROM        alpine:3.8 AS build
+FROM        alpine:3.8 AS base
+
+RUN         apk add --no-cache --update libgcc libstdc++ ca-certificates libcrypto1.0 libssl1.0 libgomp expat git
+
+
+FROM        base AS build
 
 WORKDIR     /tmp/workdir
 
@@ -68,7 +73,6 @@ RUN     buildDeps="autoconf \
                    curl \
                    coreutils \
                    diffutils \
-                   expat-dev \
                    file \
                    g++ \
                    gcc \
@@ -81,13 +85,8 @@ RUN     buildDeps="autoconf \
                    yasm \
                    nasm \
                    zlib-dev \
-                   git \
-                   libgcc \
-                   libstdc++ \
-                   ca-certificates \
-                   libcrypto1.0 \
-                   libssl1.0" && \
-        apk  add --update ${buildDeps} 
+                   expat-dev" && \
+        apk add --no-cache --update ${buildDeps}
 
 ## opencore-amr https://sourceforge.net/projects/opencore-amr/
 RUN \
